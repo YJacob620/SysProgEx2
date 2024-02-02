@@ -51,6 +51,10 @@ void do_FW() {
 
 int C(int i, int j) {
     if (did_FW == 0) {
+        if (did_mat == 0) {
+            printf("Error: Matrix not initialized.\n");
+            return -2;
+        }
         do_FW();
     }
     int ans = FW_mat[i][j];
