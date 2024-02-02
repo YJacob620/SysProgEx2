@@ -10,8 +10,8 @@ my_mat.a: my_mat.o
 	ar -r my_mat.a my_mat.o
 
 # executables
-main: main.o my_mat.a
-	gcc -Wall main.o -l:my_mat.a -L. -o main
+connections: main.o my_mat.a
+	gcc -Wall main.o -l:my_mat.a -L. -o connections
 
 # general commands
 all: main
