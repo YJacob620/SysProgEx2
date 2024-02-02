@@ -11,7 +11,7 @@ int main() {
     char c = 'Z';
     while (c != 'D' && c != EOF) {
         scanf("%c", &c);
-        if (c==' ') {
+        if (c == ' ') {
             scanf("%c", &c);
         }
         if (c == 'A') {
@@ -26,7 +26,7 @@ int main() {
             int i, j;
             scanf("%d%d", &i, &j);
             int ans = C(i, j);
-            printf("%d\n",ans);
+            printf("%d\n", ans);
         }
     }
     return 0;
