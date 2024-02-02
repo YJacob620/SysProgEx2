@@ -14,5 +14,7 @@ main: main.o my_mat.a
 	gcc -Wall main.o -l:my_mat.a -L. -o main
 
 # general commands
+all: main
+
 clean:
 	rm -f *.o *.a main
