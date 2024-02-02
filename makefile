@@ -14,7 +14,7 @@ connections: main.o my_mat.a
 	gcc -Wall main.o -l:my_mat.a -L. -o connections
 
 # general commands
-all: main
+all: connections
 
 clean:
 	rm -f *.o *.a main
