@@ -77,4 +77,3 @@ void B(int i, int j) {
         printf("True\n");
     }
 }
-
