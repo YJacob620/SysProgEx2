@@ -98,7 +98,7 @@ int main() {
             printf(" %s", curr_item.name);
         }
     }
-    printf("\n");
+    // printf("\n");
     free(items);
     return 0;
 }
