@@ -1,52 +1,71 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-typedef struct item {
-    float weight;
-    float value;
-}Item;
+#define SACK_WEIGHT 20
+#define ITEM_NUM 5
+#define DEFAULT_NAME_LENGTH 20
 
-Item* create5Items() {
-    Item* items = malloc(5 * sizeof(Item)); // so it won't "disappear" when exiting scope 
-    for (int i = 0; i < 5; i++) {
-        float w, v;
-        // printf("Enter weight of item %d\n", i + 1);
-        scanf("%f", &w);
-        // printf("Enter value of item %d\n", i + 1);
-        scanf("%f", &v);
-        items[i].weight = w;
+typedef struct item {
+    char* name;
+    int value;
+    int weight;
+} Item;
+
+Item* createItems() {
+    Item* items = malloc(ITEM_NUM * sizeof(Item)); // use malloc so array won't "disappear" when exiting scope 
+
+    for (int i = 0; i < ITEM_NUM; i++) {
+        char* curr_name = (char*)malloc(DEFAULT_NAME_LENGTH); // might want to allocate more memory for name
+        char letter = ' ';
+        int name_len = DEFAULT_NAME_LENGTH, j = 0;
+        while (letter == ' ') {
+            scanf("%c", &letter);
+        }
+        while (letter != ' ') { // loop until done scanning name
+            if (j + 1 >= name_len) { // if name of this item is too long
+                name_len *= 2;
+                curr_name = (char*)realloc(curr_name, name_len); // allocate more memory for its name
+            }
+            curr_name[j++] = letter;
+            scanf("%c", &letter);
+        }
+        curr_name[j] = '\0';
+        items[i].name = curr_name;
+
+        int v, w;
+        scanf("%d", &v); // enter value of item
+        scanf("%d", &w); // enter weight of item
         items[i].value = v;
+        items[i].weight = w;
     }
     return items;
 }
 
-void selectItems(float weights[], float values[], char* strings[], int numStrings) {
-    float DP_arr[6][21]; // the i-th row signifies being exposed to the first i items
+int knapSack(int weights[], int values[], int selected_bool[]) {
+    int DP_arr[ITEM_NUM + 1][SACK_WEIGHT + 1]; // the i-th row signifies being exposed to the first i items
 
-    for (int i = 0;i < 6;i++) { // base case for 0 weight limit
+    for (int i = 0;i <= ITEM_NUM;i++) { // base case for 0 weight limit
         DP_arr[i][0] = 0;
     }
-    for (int i = 0;i < 21;i++) { // base case for 0 items
+    for (int i = 0;i <= SACK_WEIGHT;i++) { // base case for 0 exposed items
         DP_arr[0][i] = 0;
     }
-    for (int i = 1;i < 6;i++) {
-        for (int j = 1;j < 21;j++) {
-            float a = DP_arr[i - 1][j]; // didn't choose to bag the i-th item
-            float b = 0;
+    for (int i = 1;i <= ITEM_NUM;i++) {
+        for (int j = 1;j <= SACK_WEIGHT;j++) {
+            int a = DP_arr[i - 1][j]; // case if didn't choose to bag the i-th item
+            int b = 0;
             if (j - (int)weights[i - 1] >= 0) {
-                b = DP_arr[i - 1][j - (int)weights[i - 1]] + values[i - 1]; // chose to bag the i-th item
+                b = DP_arr[i - 1][j - (int)weights[i - 1]] + values[i - 1]; // case if chose to bag the i-th item
             }
             DP_arr[i][j] = a > b ? a : b;
         }
     }
-    int i = 5, j = 20;
-    printf("Maximum profit: %d\n", (int)DP_arr[i][j]);
+    int i = ITEM_NUM, j = SACK_WEIGHT;
+    int ans = DP_arr[i][j];
 
-    char bestItems[5];
-    int k = 0;
-    while (i > 0) {
+    while (i > 0) { // backtracing from the borrom-right corner of the matrix to find which items were added
         if (DP_arr[i][j] > DP_arr[i - 1][j]) {
-            bestItems[k++] = *strings[i - 1];
+            selected_bool[i - 1] = 1;
             j -= (int)weights[i - 1];
             i--;
         }
@@ -54,41 +73,32 @@ void selectItems(float weights[], float values[], char* strings[], int numString
             i--;
         }
     }
-    if (k > 0) {
-        int l = 0;
-        printf("Items that give the maximum profit: [%c", bestItems[l++]);
-        while (l < k) {
-            printf(", %c", bestItems[l++]);
-        }
-        printf("]\n");
-    }
+    return ans;
 }
 
 int main() {
-    Item* items = create5Items();
-    float weights[5], values[5];
-    for (int i = 0; i < 5; i++) {
-        weights[i] = items[i].weight;
+    Item* items = createItems();
+    int values[ITEM_NUM], weights[ITEM_NUM];
+    for (int i = 0; i < ITEM_NUM; i++) {
         values[i] = items[i].value;
+        weights[i] = items[i].weight;
     }
-    char names[] = { 'A','B','C','D','E' };
-    char* strings[] = { &names[0],&names[1],&names[2],&names[3],&names[4] };
 
-    printf("Items = [A,B,C,D,E]\n");
-    printf("Weights = [%d", (int)weights[0]);
-    int l = 1;
-    while (l < 5) {
-        printf(", %d", (int)weights[l++]);
+    int selected_bool[ITEM_NUM];
+    for (int i = 0; i < ITEM_NUM; i++) { // by default no item is selected 
+        selected_bool[i] = 0;
     }
-    printf("]\n");
-    printf("Values = [%d", (int)values[0]);
-    l = 1;
-    while (l < 5) {
-        printf(", %d", (int)values[l++]);
-    }
-    printf("]\nW = 20\n");
-    selectItems(weights, values, strings, 5);
 
+    int ans = knapSack(weights, values, selected_bool);
+    printf("Maximum profit: %d\n", ans);
+    printf("Selected items:");
+    for (int i = 0; i < ITEM_NUM; i++) {
+        if (selected_bool[i] == 1) {
+            Item curr_item = items[i];
+            printf(" %s", curr_item.name);
+        }
+    }
+    printf("\n");
     free(items);
     return 0;
 }
