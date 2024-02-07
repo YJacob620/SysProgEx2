@@ -1,5 +1,5 @@
 # general commands
-all: connections dynamic_programming
+all: my_graph my_Knapsack
 
 clean:
 	rm -f *.o *.a connections dynamic_programming
