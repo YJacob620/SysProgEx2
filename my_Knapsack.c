@@ -5,7 +5,7 @@
 #define ITEM_NUM 5
 #define DEFAULT_NAME_LENGTH 20
 
-typedef struct item {
+typedef struct item { // honestly struct not truly needed here, mainly for practice
     char* name;
     int value;
     int weight;
@@ -22,9 +22,9 @@ Item* createItems() {
             scanf("%c", &letter);
         }
         while (letter != ' ') { // loop until done scanning name
-            if (j + 1 >= name_len) { // if name of this item is too long
+            if (j + 1 >= name_len) { // handles cases of long names (longer than 20 characters)
                 name_len *= 2;
-                curr_name = (char*)realloc(curr_name, name_len); // allocate more memory for its name
+                curr_name = (char*)realloc(curr_name, name_len); // allocate more memory for name
             }
             curr_name[j++] = letter;
             scanf("%c", &letter);
@@ -63,7 +63,7 @@ int knapSack(int weights[], int values[], int selected_bool[]) {
     int i = ITEM_NUM, j = SACK_WEIGHT;
     int ans = DP_arr[i][j];
 
-    while (i > 0) { // backtracing from the borrom-right corner of the matrix to find which items were added
+    while (i > 0) { // backtracing from the bottom-right corner of the matrix to find which items were added
         if (DP_arr[i][j] > DP_arr[i - 1][j]) {
             selected_bool[i - 1] = 1;
             j -= (int)weights[i - 1];
@@ -98,7 +98,7 @@ int main() {
             printf(" %s", curr_item.name);
         }
     }
-    // printf("\n");
+    // printf("\n"); // given tests only work without this line
     free(items);
     return 0;
 }
